@@ -1,39 +1,49 @@
+// providers/ThemeProvider.tsx
 "use client"
 
 import { createContext, useContext, useEffect, useState } from "react"
 
 type Theme = "light" | "dark" | "system"
-type ThemeContextType = {
+
+interface ThemeContextProps {
   theme: Theme
   setTheme: (theme: Theme) => void
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
+const ThemeContext = createContext<ThemeContextProps | undefined>(undefined)
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setTheme] = useState<Theme>("system")
+  const [theme, setThemeState] = useState<Theme>("system")
 
+  // localStorage dan o‘qish
   useEffect(() => {
+    const storedTheme = localStorage.getItem("theme") as Theme | null
+    if (storedTheme) {
+      setThemeState(storedTheme)
+      applyTheme(storedTheme)
+    } else {
+      applyTheme("system")
+    }
+  }, [])
+
+  // Tanlangan theme’ni qo‘llash
+  const applyTheme = (theme: Theme) => {
     const root = document.documentElement
 
-    const applyTheme = (t: Theme) => {
-      if (t === "system") {
-        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
-        root.classList.toggle("dark", prefersDark)
-      } else {
-        root.classList.toggle("dark", t === "dark")
-      }
-    }
-
-    applyTheme(theme)
-
     if (theme === "system") {
-      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
-      const handler = (e: MediaQueryListEvent) => applyTheme(e.matches ? "dark" : "light")
-      mediaQuery.addEventListener("change", handler)
-      return () => mediaQuery.removeEventListener("change", handler)
+      const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+      root.classList.toggle("dark", systemDark)
+    } else {
+      root.classList.toggle("dark", theme === "dark")
     }
-  }, [theme])
+  }
+
+  // Theme o‘zgarganda localStorage ga saqlash
+  const setTheme = (newTheme: Theme) => {
+    setThemeState(newTheme)
+    localStorage.setItem("theme", newTheme)
+    applyTheme(newTheme)
+  }
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
@@ -43,7 +53,9 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 }
 
 export const useTheme = () => {
-  const ctx = useContext(ThemeContext)
-  if (!ctx) throw new Error("useTheme must be used inside ThemeProvider")
-  return ctx
+  const context = useContext(ThemeContext)
+  if (!context) {
+    throw new Error("useTheme must be used within a ThemeProvider")
+  }
+  return context
 }
