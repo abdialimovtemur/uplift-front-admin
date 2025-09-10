@@ -1,27 +1,40 @@
 // types/auth.ts
+export interface PhoneVerificationRequest {
+  phone: string;
+}
+
+export interface PhoneVerificationResponse {
+  message: string;
+}
+
+export interface VerifyPhoneRequest {
+  phone: string;
+  code: string;
+}
+
 export interface User {
-  _id: string
-  name: string
-  email: string
-  phone?: string
-  role: string
-  createdAt: string
-  updatedAt: string
+  _id: string;
+  phone: string;
+  role: string;
+  status: string;
+  phoneVerified: boolean;
+  createdAt: string;
+  updatedAt: string;
+  lastLoginAt?: string;
 }
 
-export interface LoginCredentials {
-  identifier: string
-  password: string
+export interface VerifyPhoneResponse {
+  message: string;
+  data: {
+    user: User;
+    accessToken: string;
+  };
 }
 
-export interface LoginResponse {
-  access_token: string
-  user: User
-}
-
+// Add AuthContextType interface
 export interface AuthContextType {
-  user: User | null
-  login: (user: User, token: string) => void
-  logout: () => void
-  loading: boolean
+  user: User | null;
+  login: (userData: User, token: string) => void;
+  logout: () => void;
+  loading: boolean;
 }

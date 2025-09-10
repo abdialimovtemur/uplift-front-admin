@@ -1,7 +1,7 @@
 // api/api.ts
 import axios from 'axios'
 
-const API_BASE_URL = 'https://dead.uz/api'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -19,9 +19,7 @@ api.interceptors.request.use(
     }
     return config
   },
-  (error) => {
-    return Promise.reject(error)
-  }
+  (error) => Promise.reject(error)
 )
 
 // Response interceptor to handle auth errors

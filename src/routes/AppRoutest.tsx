@@ -8,6 +8,7 @@ import Login from "@/pages/auth/Login";
 import type { ReactNode } from "react";
 import { UserStatistics } from "@/pages/UserStatistics";
 import { Settings } from "@/pages/Settings";
+import { Pricing } from "@/pages/Pricing";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -35,6 +36,10 @@ const protectedRoutes = [
     path: "/settings",
     element: <Settings />,
   },
+  {
+    path: "/pricing",
+    element: <Pricing/>
+  }
 ];
 
 const AppRoutes = () => {

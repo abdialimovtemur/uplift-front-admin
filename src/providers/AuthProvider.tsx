@@ -1,6 +1,7 @@
 // providers/AuthProvider.tsx
 import type { AuthContextType, User } from '@/types/auth'
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
+// import { User, AuthContextType } from '@/types/auth'
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
@@ -16,37 +17,56 @@ interface AuthProviderProps {
   children: ReactNode
 }
 
+// Cookie helper functions
+const setCookie = (name: string, value: string, days: number = 7) => {
+  const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString()
+  document.cookie = `${name}=${value}; expires=${expires}; path=/; Secure; SameSite=Strict`
+}
+
+const getCookie = (name: string): string | null => {
+  const value = `; ${document.cookie}`
+  const parts = value.split(`; ${name}=`)
+  if (parts.length === 2) return parts.pop()?.split(';').shift() || null
+  return null
+}
+
+const deleteCookie = (name: string) => {
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
+}
+
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Token VA user ma'lumotlarini tekshiramiz
-    const token = localStorage.getItem('access_token')
-    const userData = localStorage.getItem('user')
+    // Check for token and user data in cookies
+    const token = getCookie('access_token')
+    const userData = getCookie('user')
     
     if (token && userData) {
       try {
         setUser(JSON.parse(userData))
       } catch (error) {
         console.error('Error parsing user data:', error)
-        // Agar xato bo'lsa, tozalaymiz
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('user')
+        // If there's an error, clear the cookies
+        deleteCookie('access_token')
+        deleteCookie('user')
       }
     }
     setLoading(false)
   }, [])
 
   const login = (userData: User, token: string) => {
-    localStorage.setItem('access_token', token)
-    localStorage.setItem('user', JSON.stringify(userData)) // ✅ User ma'lumotlarini saqlaymiz
+    // Store token and user data in cookies instead of localStorage
+    setCookie('access_token', token)
+    setCookie('user', JSON.stringify(userData))
     setUser(userData)
   }
 
   const logout = () => {
-    localStorage.removeItem('access_token')
-    localStorage.removeItem('user') // ✅ User ma'lumotlarini ham o'chiramiz
+    // Remove cookies instead of localStorage items
+    deleteCookie('access_token')
+    deleteCookie('user')
     setUser(null)
   }
 

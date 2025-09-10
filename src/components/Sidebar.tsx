@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom"
 import { cn } from "../lib/utils"
 
 // Lucide iconlar
-import { LayoutDashboard, Settings, Users } from "lucide-react"
+import { DollarSignIcon, LayoutDashboard, Settings, Users } from "lucide-react"
 
 const Sidebar = () => {
   const location = useLocation()
@@ -10,11 +10,12 @@ const Sidebar = () => {
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Users", href: "/users", icon: Users },
+    { name: "Pricing", href: "/pricing", icon: DollarSignIcon },
     { name: "Settings", href: "/settings", icon: Settings },
   ]
 
   return (
-    <aside className="w-64 h-screen sticky top-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
+    <aside className="w-64 h-screen sticky top-0 bg-white dark:bg-sidebar border-r border-gray-200 dark:border-gray-800 flex flex-col">
       {/* Logo / Title */}
       <div className="h-16 flex items-center justify-center border-b border-gray-200 dark:border-gray-800">
         <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">Admin</h1>

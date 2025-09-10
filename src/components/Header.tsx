@@ -1,6 +1,5 @@
 "use client"
 
-import { useAuth } from "@/providers/AuthProvider"
 import { useTheme } from "@/providers/ThemeProvider"
 import {
   Select,
@@ -12,11 +11,10 @@ import {
 import { Laptop, Moon, Sun } from "lucide-react"
 
 const Header = () => {
-  const { user } = useAuth()
   const { theme, setTheme } = useTheme()
 
   return (
-    <header className="bg-white dark:bg-gray-900 shadow-sm h-16 w-full ">
+    <header className="bg-white dark:bg-sidebar shadow-sm h-16 w-full ">
       <div className="flex items-center justify-end px-6 py-4">
         {/* Logo / Title */}
       
@@ -35,13 +33,6 @@ const Header = () => {
             </SelectContent>
           </Select>
 
-          {/* User info */}
-          <span className="text-sm text-gray-600 dark:text-gray-300">
-            Welcome, {user?.name}
-          </span>
-          <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm font-medium">
-            {user?.name?.charAt(0)}
-          </div>
         </div>
       </div>
     </header>
