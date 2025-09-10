@@ -12,10 +12,7 @@ export interface UserPlanAnalytics {
     status: string;
     count: number;
   }>;
-  monthlyGrowth: Array<{
-    month: string;
-    growth: number;
-  }>;
+   monthlyGrowth: MonthlyGrowth[];
 }
 
 export interface DashboardFilters {
@@ -23,3 +20,27 @@ export interface DashboardFilters {
   endDate?: string;
   planType?: string;
 }
+
+
+export interface MonthlyGrowth {
+  month: string;
+  count: number;
+  revenue: number;
+}
+
+// export interface UserPlanAnalytics {
+//   totalUsers: number;
+//   activeSubscriptions: number;
+//   expiredSubscriptions: number;
+//   totalRevenue: number;
+//   averageRevenuePerUser: number;
+//   subscriptionTypes: Array<{
+//     type: string;
+//     count: number;
+//   }>;
+//   paymentStatuses: Array<{
+//     status: string;
+//     count: number;
+//   }>;
+//  
+// }

@@ -1,14 +1,11 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-// import { useUserPlansAnalytics } from '@/hooks/queries/dashboard';
-// import StatsCards from './StatsCards';
-// import SubscriptionChart from './SubscriptionChart';
-// import PaymentStatusChart from './PaymentStatusChart';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUserPlansAnalytics } from '@/api/queries/dashboard';
 import SubscriptionChart from './SubscriptionChart';
 import PaymentStatusChart from './PaymentStatusChart';
 import StatsCards from './StatsCards';
+import MonthlyGrowthChart from './MonthlyGrowthChart';
 
 const UserPlansAnalytics: React.FC = () => {
   const { data, isLoading, error } = useUserPlansAnalytics();
@@ -68,6 +65,14 @@ const UserPlansAnalytics: React.FC = () => {
               </CardContent>
             </Card>
           </div>
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-32" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-64 w-full" />
+            </CardContent>
+          </Card>
         </div>
       ) : data ? (
         <>
@@ -78,22 +83,7 @@ const UserPlansAnalytics: React.FC = () => {
             <PaymentStatusChart data={data.paymentStatuses} />
           </div>
 
-          {data.monthlyGrowth.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Oylik o'sish</CardTitle>
-                <CardDescription>Oxirgi oylardagi obuna o'sishi</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-80">
-                  {/* Monthly growth chart would be implemented here */}
-                  <div className="flex items-center justify-center h-full text-muted-foreground">
-                    Oylik o'sish grafigi - Recharts komponenti
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          <MonthlyGrowthChart data={data.monthlyGrowth} />
         </>
       ) : null}
     </div>
