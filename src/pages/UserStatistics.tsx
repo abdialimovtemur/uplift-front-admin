@@ -1,6 +1,9 @@
+import UserManagement from "@/components/users/UserManagement"
 
 export const UserStatistics = () => {
   return (
-    <div>UserStatistics</div>
+    <div>
+      <UserManagement/>
+    </div>
   )
 }

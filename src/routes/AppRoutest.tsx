@@ -1,7 +1,7 @@
 // routes/AppRoutes.tsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/providers/AuthProvider";
-import Dashboard from "@/pages/Dashboard";
+// import Dashboard from "@/pages/Dashboard";
 import Layout from "@/components/Layout";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Login from "@/pages/auth/Login";
@@ -9,6 +9,8 @@ import type { ReactNode } from "react";
 import { UserStatistics } from "@/pages/UserStatistics";
 import { Settings } from "@/pages/Settings";
 import { Pricing } from "@/pages/Pricing";
+import { Dashboard } from "@/pages/Dashboard";
+// import Dashboard from "@/pages/Dashboard";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -26,7 +28,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 const protectedRoutes = [
   {
     path: "/dashboard",
-    element: <Dashboard />,
+    element: <Dashboard/>,
   },
   {
     path: "/users",
