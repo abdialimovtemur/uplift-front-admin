@@ -2,7 +2,9 @@ import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+// import SubmissionTimeline from './SubmissionTimeline';
 import type { UserPlanAnalytics } from '@/types/dashboard';
+import SubmissionTimeline from './SubmissionTimeline';
 
 interface WritingAnalyticsProps {
   data: UserPlanAnalytics;
@@ -144,33 +146,8 @@ const WritingAnalytics: React.FC<WritingAnalyticsProps> = ({ data }) => {
         </CardContent>
       </Card>
 
-      {/* Timeline Overview */}
-      <Card className="border-0 shadow-sm">
-        <CardHeader>
-          <CardTitle>Submission Timeline</CardTitle>
-          <CardDescription>Recent submission activity</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={writingSubmissions.timeline}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar 
-                  dataKey="count" 
-                  fill="#10b981" 
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="text-sm text-muted-foreground mt-4">
-            Latest: {writingSubmissions.timeline[0]?.date} - {writingSubmissions.timeline[0]?.count} submissions
-          </div>
-        </CardContent>
-      </Card>
+      {/* Submission Timeline with Daily Revenue Trend Design */}
+      <SubmissionTimeline data={writingSubmissions.timeline} />
     </div>
   );
 };

@@ -6,15 +6,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, Eye, Trash2, ChevronLeft, ChevronRight, Calendar, BarChart3 } from 'lucide-react';
+import { Search, Eye, Trash2, ChevronLeft, ChevronRight, Calendar, BarChart3, Crown } from 'lucide-react';
 import UserDetailDialog from './UserDetailDialog';
 import DeleteUserDialog from './DeleteUserDialog';
+import { PlanSelectionModal } from '@/components/users/PlanSelectionModal';
 import { getRoleBadgeVariant, getStatusBadgeVariant, formatStatus } from '@/utils/userUtils';
 import { useUsersQuery } from '@/api/queries/users';
 import { useDeleteUserMutation } from '@/api/mutations/users';
+import { useActivePlansQuery } from '@/api/queries/plans';
+import { usePromoteUserMutation } from '@/api/mutations/userPlans';
 import type { User, UserFilters } from '@/types/user';
+// import type { Plan } from '@/types/userPlan';
 
-// Extend the User type to include userPlan
 interface UserWithPlan extends User {
   userPlan?: {
     _id: string;
@@ -45,11 +48,15 @@ const UserManagement: React.FC = () => {
 
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [userToDelete, setUserToDelete] = useState<UserWithPlan | null>(null);
+  const [userToPromote, setUserToPromote] = useState<UserWithPlan | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [promoteDialogOpen, setPromoteDialogOpen] = useState(false);
 
-  const { data, isLoading, error } = useUsersQuery(filters);
+  const { data: usersData, isLoading, error } = useUsersQuery(filters);
+  const { data: plansData } = useActivePlansQuery();
   const deleteUserMutation = useDeleteUserMutation();
+  const promoteUserMutation = usePromoteUserMutation();
 
   const handleSearch = (searchTerm: string) => {
     setFilters(prev => ({ ...prev, search: searchTerm, page: 1 }));
@@ -85,6 +92,15 @@ const UserManagement: React.FC = () => {
     setDeleteDialogOpen(true);
   };
 
+  const handlePromoteUser = (user: UserWithPlan) => {
+    setUserToPromote(user);
+    setPromoteDialogOpen(true);
+  };
+
+  const handlePromote = (userId: string, planId: string, reason: string) => {
+    promoteUserMutation.mutate({ userId, planId, reason });
+  };
+
   const confirmDelete = () => {
     if (userToDelete) {
       deleteUserMutation.mutate(userToDelete._id);
@@ -113,8 +129,6 @@ const UserManagement: React.FC = () => {
     return Math.round((used / limit) * 100);
   };
 
-
-  // Tartib raqamini hisoblash
   const getRowNumber = (index: number) => {
     const currentPage = filters.page || 1;
     const itemsPerPage = filters.limit || 10;
@@ -169,7 +183,7 @@ const UserManagement: React.FC = () => {
         <CardHeader className="pb-3">
           <CardTitle>Foydalanuvchilar Ro'yxati</CardTitle>
           <CardDescription>
-            Jami {data?.pagination.total || 0} ta foydalanuvchi topildi
+            Jami {usersData?.pagination.total || 0} ta foydalanuvchi topildi
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -186,7 +200,7 @@ const UserManagement: React.FC = () => {
                 </div>
               ))}
             </div>
-          ) : data && data.data.length > 0 ? (
+          ) : usersData && usersData.data.length > 0 ? (
             <>
               <div className="rounded-md border">
                 <Table>
@@ -203,7 +217,7 @@ const UserManagement: React.FC = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {(data.data as UserWithPlan[]).map((user, index) => (
+                    {(usersData.data as UserWithPlan[]).map((user, index) => (
                       <TableRow key={user._id}>
                         <TableCell className="font-medium text-center">
                           {getRowNumber(index)}
@@ -223,7 +237,10 @@ const UserManagement: React.FC = () => {
                         </TableCell>
                         <TableCell>
                           {user.userPlan ? (
-                            <div className="flex flex-col gap-1">
+                            <div 
+                              className="flex flex-col gap-1 cursor-pointer hover:bg-red-300 p-2 rounded-md"
+                              onClick={() => handlePromoteUser(user)}
+                            >
                               <Badge variant={getPlanBadgeVariant(user.userPlan.hasPaidPlan)}>
                                 {user.userPlan.plan.title}
                               </Badge>
@@ -232,7 +249,12 @@ const UserManagement: React.FC = () => {
                               </div>
                             </div>
                           ) : (
-                            <Badge variant="outline">Tarif yo'q</Badge>
+                            <div 
+                              className="cursor-pointer hover:bg-red-300 p-2 rounded-md"
+                              onClick={() => handlePromoteUser(user)}
+                            >
+                              <Badge variant="outline">Tarif yo'q</Badge>
+                            </div>
                           )}
                         </TableCell>
                         <TableCell>
@@ -278,6 +300,14 @@ const UserManagement: React.FC = () => {
                             <Button
                               variant="outline"
                               size="icon"
+                              onClick={() => handlePromoteUser(user)}
+                              title="Change plan"
+                            >
+                              <Crown className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="icon"
                               onClick={() => handleDeleteUser(user)}
                               disabled={user.role === 'SUPER_ADMIN'}
                             >
@@ -292,30 +322,30 @@ const UserManagement: React.FC = () => {
               </div>
 
               {/* Pagination */}
-              {data.pagination.totalPages > 1 && (
+              {usersData.pagination.totalPages > 1 && (
                 <div className="flex items-center justify-between px-2 py-4">
                   <div className="text-sm text-muted-foreground">
                     Ko'rsatilmoqda {((filters.page || 1) - 1) * (filters.limit || 10) + 1} dan{' '}
-                    {Math.min((filters.page || 1) * (filters.limit || 10), data.pagination.total)} gacha, jami{' '}
-                    {data.pagination.total} ta yozuv
+                    {Math.min((filters.page || 1) * (filters.limit || 10), usersData.pagination.total)} gacha, jami{' '}
+                    {usersData.pagination.total} ta yozuv
                   </div>
                   <div className="flex items-center space-x-2">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handlePageChange((filters.page || 1) - 1)}
-                      disabled={!data.pagination.hasPrev}
+                      disabled={!usersData.pagination.hasPrev}
                     >
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
                     <span className="text-sm">
-                      {filters.page} / {data.pagination.totalPages}
+                      {filters.page} / {usersData.pagination.totalPages}
                     </span>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handlePageChange((filters.page || 1) + 1)}
-                      disabled={!data.pagination.hasNext}
+                      disabled={!usersData.pagination.hasNext}
                     >
                       <ChevronRight className="h-4 w-4" />
                     </Button>
@@ -344,6 +374,17 @@ const UserManagement: React.FC = () => {
         user={userToDelete}
         onConfirm={confirmDelete}
         isLoading={deleteUserMutation.isPending}
+      />
+
+      <PlanSelectionModal
+        open={promoteDialogOpen}
+        onOpenChange={setPromoteDialogOpen}
+        userId={userToPromote?._id || ''}
+        userName={userToPromote?.phone || ''}
+        currentPlan={userToPromote?.userPlan?.plan.title}
+        plans={plansData || []}
+        onPromote={handlePromote}
+        isLoading={promoteUserMutation.isPending}
       />
     </div>
   );
