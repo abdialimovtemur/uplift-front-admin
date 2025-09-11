@@ -1,28 +1,29 @@
-import type { Plan, PlanFilters } from '@/types/pricing';
+// hooks/usePricing.ts
 import { useState } from 'react';
+import type { Plan, PlanFilters } from '@/types/pricing';
 
 export const usePricing = () => {
   const [filters, setFilters] = useState<PlanFilters>({
     page: 1,
     limit: 10,
-    sortBy: 'sortOrder',
-    sortOrder: 'asc',
+    sortBy: 'createdAt',
+    sortOrder: 'desc'
   });
-
+  
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
 
   const updateFilter = (key: keyof PlanFilters, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value, page: 1 }));
-  };
-
-  const handleEdit = (plan: Plan) => {
-    setEditingPlan(plan);
-    setIsFormOpen(true);
+    setFilters(prev => ({ ...prev, [key]: value }));
   };
 
   const handleCreate = () => {
     setEditingPlan(null);
+    setIsFormOpen(true);
+  };
+
+  const handleEdit = (plan: Plan) => {
+    setEditingPlan(plan);
     setIsFormOpen(true);
   };
 

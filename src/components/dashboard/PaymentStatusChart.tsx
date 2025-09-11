@@ -26,8 +26,8 @@ const PaymentStatusChart: React.FC<PaymentStatusChartProps> = ({ data }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>To'lov holati</CardTitle>
-        <CardDescription>To'lov holatlari bo'yicha statistik</CardDescription>
+        <CardTitle>Payment status</CardTitle>
+        <CardDescription>Payment status statistics</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="h-80">
@@ -46,7 +46,7 @@ const PaymentStatusChart: React.FC<PaymentStatusChartProps> = ({ data }) => {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="count" fill="#8884d8" />
+              <Bar dataKey="count" fill="#10b981" />
             </BarChart>
           </ResponsiveContainer>
         </div>

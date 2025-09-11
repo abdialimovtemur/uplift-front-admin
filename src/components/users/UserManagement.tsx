@@ -6,13 +6,34 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, Eye, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Eye, Trash2, ChevronLeft, ChevronRight, Calendar, BarChart3 } from 'lucide-react';
 import UserDetailDialog from './UserDetailDialog';
 import DeleteUserDialog from './DeleteUserDialog';
 import { getRoleBadgeVariant, getStatusBadgeVariant, formatStatus } from '@/utils/userUtils';
 import { useUsersQuery } from '@/api/queries/users';
 import { useDeleteUserMutation } from '@/api/mutations/users';
 import type { User, UserFilters } from '@/types/user';
+
+// Extend the User type to include userPlan
+interface UserWithPlan extends User {
+  userPlan?: {
+    _id: string;
+    plan: {
+      _id: string;
+      title: string;
+      price: number;
+      currency: string;
+      features: string[];
+    };
+    status: string;
+    subscriptionType: string;
+    paymentStatus: string;
+    submissionsUsed: number;
+    submissionsLimit: number;
+    hasPaidPlan: boolean;
+    subscriptionEndDate: string;
+  };
+}
 
 const UserManagement: React.FC = () => {
   const [filters, setFilters] = useState<UserFilters>({
@@ -21,9 +42,9 @@ const UserManagement: React.FC = () => {
     sortBy: 'createdAt',
     sortOrder: 'desc'
   });
-  
+
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [userToDelete, setUserToDelete] = useState<UserWithPlan | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
@@ -35,18 +56,18 @@ const UserManagement: React.FC = () => {
   };
 
   const handleRoleFilter = (role: string) => {
-    setFilters(prev => ({ 
-      ...prev, 
+    setFilters(prev => ({
+      ...prev,
       role: role === 'all' ? undefined : role,
-      page: 1 
+      page: 1
     }));
   };
 
   const handleStatusFilter = (status: string) => {
-    setFilters(prev => ({ 
-      ...prev, 
+    setFilters(prev => ({
+      ...prev,
       status: status === 'all' ? undefined : status,
-      page: 1 
+      page: 1
     }));
   };
 
@@ -59,7 +80,7 @@ const UserManagement: React.FC = () => {
     setDetailDialogOpen(true);
   };
 
-  const handleDeleteUser = (user: User) => {
+  const handleDeleteUser = (user: UserWithPlan) => {
     setUserToDelete(user);
     setDeleteDialogOpen(true);
   };
@@ -71,6 +92,27 @@ const UserManagement: React.FC = () => {
       setUserToDelete(null);
     }
   };
+
+  // Format currency
+  const formatCurrency = (amount: number, currency: string) => {
+    return new Intl.NumberFormat('uz-UZ', {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 0,
+    }).format(amount);
+  };
+
+  // Get plan badge variant
+  const getPlanBadgeVariant = (hasPaidPlan: boolean) => {
+    return hasPaidPlan ? 'default' : 'secondary';
+  };
+
+  // Get usage percentage
+  const getUsagePercentage = (used: number, limit: number) => {
+    if (limit === 0) return 0;
+    return Math.round((used / limit) * 100);
+  };
+
 
   // Tartib raqamini hisoblash
   const getRowNumber = (index: number) => {
@@ -94,7 +136,7 @@ const UserManagement: React.FC = () => {
                 onChange={(e) => handleSearch(e.target.value)}
               />
             </div>
-            
+
             <Select onValueChange={handleRoleFilter}>
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Rol bo'yicha" />
@@ -154,12 +196,14 @@ const UserManagement: React.FC = () => {
                       <TableHead>Telefon</TableHead>
                       <TableHead>Rol</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead>Ro'yxatdan o'tgan sana</TableHead>
+                      <TableHead>Tarif</TableHead>
+                      <TableHead>Foydalanish</TableHead>
+                      <TableHead>Obuna muddati</TableHead>
                       <TableHead className="text-right">Amallar</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {data.data.map((user, index) => (
+                    {(data.data as UserWithPlan[]).map((user, index) => (
                       <TableRow key={user._id}>
                         <TableCell className="font-medium text-center">
                           {getRowNumber(index)}
@@ -178,7 +222,49 @@ const UserManagement: React.FC = () => {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          {new Date(user.createdAt).toLocaleDateString('uz-UZ')}
+                          {user.userPlan ? (
+                            <div className="flex flex-col gap-1">
+                              <Badge variant={getPlanBadgeVariant(user.userPlan.hasPaidPlan)}>
+                                {user.userPlan.plan.title}
+                              </Badge>
+                              <div className="text-xs text-muted-foreground">
+                                {formatCurrency(user.userPlan.plan.price, user.userPlan.plan.currency)}
+                              </div>
+                            </div>
+                          ) : (
+                            <Badge variant="outline">Tarif yo'q</Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {user.userPlan ? (
+                            <div className="flex items-center gap-2">
+                              <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                              <div className="flex-1">
+                                <div className="flex justify-between text-xs mb-1">
+                                  <span>{user.userPlan.submissionsUsed} / {user.userPlan.submissionsLimit}</span>
+                                  <span>{getUsagePercentage(user.userPlan.submissionsUsed, user.userPlan.submissionsLimit)}%</span>
+                                </div>
+                                <div className="w-full bg-secondary rounded-full h-1.5">
+                                  <div 
+                                    className="bg-primary h-1.5 rounded-full" 
+                                    style={{ width: `${getUsagePercentage(user.userPlan.submissionsUsed, user.userPlan.submissionsLimit)}%` }}
+                                  ></div>
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground text-sm">Mavjud emas</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {user.userPlan ? (
+                            <div className="flex items-center gap-1 text-sm">
+                              <Calendar className="h-3 w-3 text-muted-foreground" />
+                              {new Date(user.userPlan.subscriptionEndDate).toLocaleDateString('uz-UZ')}
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground text-sm">Mavjud emas</span>
+                          )}
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end space-x-2">

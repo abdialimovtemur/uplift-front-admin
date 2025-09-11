@@ -8,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-// import { PlanFiltersComponent } from '@/components/pricing/PlanFilters';
 import { PlanTable } from '@/components/pricing/PlanTable';
 import { PlanActions } from '@/components/pricing/PlanActions';
 import { PlanForm } from '@/components/pricing/PlanForm';
@@ -29,9 +28,9 @@ export const Pricing = () => {
   const updateMutation = useUpdatePlanMutation();
   const deleteMutation = useDeletePlanMutation();
 
-  const handleSubmit = (formData: any) => {
-    if (editingPlan) {
-      updateMutation.mutate({ id: editingPlan._id!, data: formData });
+  const handleSubmit = (formData: FormData) => {
+    if (editingPlan && editingPlan._id) {
+      updateMutation.mutate({ id: editingPlan._id, formData });
     } else {
       createMutation.mutate(formData);
     }
@@ -58,11 +57,6 @@ export const Pricing = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* <PlanFiltersComponent 
-            filters={filters} 
-            onFilterChange={updateFilter} 
-          /> */}
-          
           <PlanTable
             plans={data?.data || []}
             onEdit={handleEdit}
@@ -70,13 +64,18 @@ export const Pricing = () => {
             isLoading={isLoading}
           />
           
-          {data?.pagination && (
-            <PlanActions
-              pagination={data.pagination}
-              onPageChange={handlePageChange}
-              onCreate={handleCreate}
-            />
-          )}
+          <PlanActions
+            pagination={data?.pagination || {
+              page: filters.page.toString(),
+              limit: filters.limit.toString(),
+              total: data?.data?.length || 0,
+              totalPages: 1,
+              hasNext: false,
+              hasPrev: false
+            }}
+            onPageChange={handlePageChange}
+            onCreate={handleCreate}
+          />
         </CardContent>
       </Card>
 

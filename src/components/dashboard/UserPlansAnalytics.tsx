@@ -1,11 +1,13 @@
 import React from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUserPlansAnalytics } from '@/api/queries/dashboard';
+import StatsCards from './StatsCards';
+// import RevenueCharts from './RevenueCharts';
 import SubscriptionChart from './SubscriptionChart';
 import PaymentStatusChart from './PaymentStatusChart';
-import StatsCards from './StatsCards';
 import MonthlyGrowthChart from './MonthlyGrowthChart';
+import WritingAnalytics from './WritingAnalytics';
 
 const UserPlansAnalytics: React.FC = () => {
   const { data, isLoading, error } = useUserPlansAnalytics();
@@ -27,52 +29,55 @@ const UserPlansAnalytics: React.FC = () => {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Obuna statistikasi</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">Analytics Dashboard</h1>
         <p className="text-muted-foreground">
-          Foydalanuvchilar obunalari va to'lovlar statistikasi
+          Comprehensive overview of platform performance and user activity
         </p>
       </div>
 
       {isLoading ? (
         <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <Card key={i}>
-                <CardHeader className="pb-2">
-                  <Skeleton className="h-4 w-24" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-8 w-16" />
-                </CardContent>
-              </Card>
-            ))}
+          {/* Birinchi qator skeleton */}
+          <div>
+            <Skeleton className="h-6 w-32 mb-4" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <Card key={i} className="border-0 shadow-sm">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Skeleton className="h-3 w-20 mb-2" />
+                        <Skeleton className="h-6 w-16 mb-2" />
+                        <Skeleton className="h-3 w-24" />
+                      </div>
+                      <Skeleton className="h-8 w-8 rounded-lg" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <Skeleton className="h-6 w-32" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-64 w-full" />
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <Skeleton className="h-6 w-32" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-64 w-full" />
-              </CardContent>
-            </Card>
+
+          {/* Ikkinchi qator skeleton */}
+          <div>
+            <Skeleton className="h-6 w-32 mb-4" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <Card key={i} className="border-0 shadow-sm">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Skeleton className="h-3 w-20 mb-2" />
+                        <Skeleton className="h-6 w-16 mb-2" />
+                        <Skeleton className="h-3 w-24" />
+                      </div>
+                      <Skeleton className="h-8 w-8 rounded-lg" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
-          <Card>
-            <CardHeader>
-              <Skeleton className="h-6 w-32" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-64 w-full" />
-            </CardContent>
-          </Card>
         </div>
       ) : data ? (
         <>
@@ -84,6 +89,10 @@ const UserPlansAnalytics: React.FC = () => {
           </div>
 
           <MonthlyGrowthChart data={data.monthlyGrowth} />
+
+          <WritingAnalytics data={data} />
+
+          {/* <RevenueCharts data={data} /> */}
         </>
       ) : null}
     </div>

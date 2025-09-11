@@ -2,7 +2,6 @@ import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { MonthlyGrowth } from '@/types/dashboard';
-// import { MonthlyGrowth } from '@/types/dashboard';
 
 interface MonthlyGrowthChartProps {
   data: MonthlyGrowth[];
@@ -13,12 +12,12 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({ data }) => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Oylik o'sish</CardTitle>
-          <CardDescription>Oxirgi oylardagi obuna o'sishi</CardDescription>
+          <CardTitle>Monthly growth</CardTitle>
+          <CardDescription>Subscription growth in recent months</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-80 text-muted-foreground">
-            Ma'lumot mavjud emas
+            Information not available
           </div>
         </CardContent>
       </Card>
@@ -60,8 +59,8 @@ const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({ data }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Oylik o'sish</CardTitle>
-        <CardDescription>Oxirgi oylardagi obuna o'sishi va daromad</CardDescription>
+        <CardTitle>Monthly growth</CardTitle>
+        <CardDescription>Subscription growth and revenue in recent months</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="h-80">

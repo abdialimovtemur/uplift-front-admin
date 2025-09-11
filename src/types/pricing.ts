@@ -1,6 +1,6 @@
 export interface Plan {
   _id?: string;
-  icon: string;
+  icon?: string;
   title: string;
   description: string;
   features: string[];

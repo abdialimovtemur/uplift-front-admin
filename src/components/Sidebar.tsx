@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom"
 import { cn } from "../lib/utils"
 
 // Lucide iconlar
-import { DollarSignIcon, LayoutDashboard, Settings, Users } from "lucide-react"
+import { DollarSignIcon, FilePlus2Icon, LayoutDashboard, Settings, Users } from "lucide-react"
 
 const Sidebar = () => {
   const location = useLocation()
@@ -11,6 +11,7 @@ const Sidebar = () => {
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Users", href: "/users", icon: Users },
     { name: "Pricing", href: "/pricing", icon: DollarSignIcon },
+    { name: "Create Topic", href: "/topic", icon: FilePlus2Icon },
     { name: "Settings", href: "/settings", icon: Settings },
   ]
 

@@ -1,12 +1,17 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../api';
-import type { Plan } from '@/types/pricing';
+// import type { Plan } from '@/types/pricing';
 import { toast } from 'sonner';
 
 export const useCreatePlanMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (newPlan: Partial<Plan>) => api.post('/plans', newPlan),
+    mutationFn: (formData: FormData) => 
+      api.post('/plans', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['plans'] });
       toast.success('Plan created successfully');
@@ -20,8 +25,12 @@ export const useCreatePlanMutation = () => {
 export const useUpdatePlanMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<Plan> }) =>
-      api.patch(`/plans/${id}`, data),
+    mutationFn: ({ id, formData }: { id: string; formData: FormData }) =>
+      api.patch(`/plans/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['plans'] });
       toast.success('Plan updated successfully');

@@ -6,7 +6,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-// import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react';
 import type { PlanFilters } from '@/types/pricing';
 
@@ -31,28 +30,28 @@ export const PlanFiltersComponent = ({ filters, onFilterChange }: PlanFiltersPro
       
       <div className="flex gap-2 flex-wrap">
         <Select
-          value={filters.status || ''}
-          onValueChange={(value) => onFilterChange('status', value)}
+          value={filters.status || 'ALL'}
+          onValueChange={(value) => onFilterChange('status', value === 'ALL' ? undefined : value)}
         >
           <SelectTrigger className="w-[130px]">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Status</SelectItem>
+            <SelectItem value="ALL">All Status</SelectItem>
             <SelectItem value="ACTIVE">Active</SelectItem>
             <SelectItem value="INACTIVE">Inactive</SelectItem>
           </SelectContent>
         </Select>
 
         <Select
-          value={filters.billingCycle || ''}
-          onValueChange={(value) => onFilterChange('billingCycle', value)}
+          value={filters.billingCycle || 'ALL'}
+          onValueChange={(value) => onFilterChange('billingCycle', value === 'ALL' ? undefined : value)}
         >
           <SelectTrigger className="w-[130px]">
             <SelectValue placeholder="Billing" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Billing</SelectItem>
+            <SelectItem value="ALL">All Billing</SelectItem>
             <SelectItem value="MONTHLY">Monthly</SelectItem>
             <SelectItem value="YEARLY">Yearly</SelectItem>
             <SelectItem value="LIFETIME">Lifetime</SelectItem>
@@ -60,14 +59,14 @@ export const PlanFiltersComponent = ({ filters, onFilterChange }: PlanFiltersPro
         </Select>
 
         <Select
-          value={filters.isActive?.toString() || ''}
-          onValueChange={(value) => onFilterChange('isActive', value === 'true')}
+          value={filters.isActive === undefined ? 'ALL' : filters.isActive.toString()}
+          onValueChange={(value) => onFilterChange('isActive', value === 'ALL' ? undefined : value === 'true')}
         >
           <SelectTrigger className="w-[130px]">
             <SelectValue placeholder="Active" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All</SelectItem>
+            <SelectItem value="ALL">All</SelectItem>
             <SelectItem value="true">Active Only</SelectItem>
             <SelectItem value="false">Inactive Only</SelectItem>
           </SelectContent>

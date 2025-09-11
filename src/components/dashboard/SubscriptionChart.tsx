@@ -13,8 +13,8 @@ const SubscriptionChart: React.FC<SubscriptionChartProps> = ({ data }) => {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Obuna turlari</CardTitle>
-          <CardDescription>Obuna turlari bo'yicha taqsimot</CardDescription>
+          <CardTitle>Subscription types</CardTitle>
+          <CardDescription>Distribution by subscription type</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center h-80 text-muted-foreground">
@@ -28,8 +28,8 @@ const SubscriptionChart: React.FC<SubscriptionChartProps> = ({ data }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Obuna turlari</CardTitle>
-        <CardDescription>Obuna turlari bo'yicha taqsimot</CardDescription>
+        <CardTitle>Subscription types</CardTitle>
+        <CardDescription>Distribution by subscription type</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="h-80">

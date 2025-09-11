@@ -10,6 +10,8 @@ import { UserStatistics } from "@/pages/UserStatistics";
 import { Settings } from "@/pages/Settings";
 import { Pricing } from "@/pages/Pricing";
 import { Dashboard } from "@/pages/Dashboard";
+import TopicsManagement from "@/pages/CreateTopic";
+// import { CreateTopic } from "@/pages/CreateTopic";
 // import Dashboard from "@/pages/Dashboard";
 
 interface ProtectedRouteProps {
@@ -41,6 +43,10 @@ const protectedRoutes = [
   {
     path: "/pricing",
     element: <Pricing/>
+  },
+  {
+    path: "/topic",
+    element: <TopicsManagement/>
   }
 ];
 
