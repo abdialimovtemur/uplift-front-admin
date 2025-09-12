@@ -46,9 +46,19 @@ const Login = () => {
 
     verifyPhoneMutation.mutate({ phone, code }, {
       onSuccess: (data) => {
-        toast.success(data.message || 'Login successful');
-        login(data.data.user, data.data.accessToken);
-        navigate('/dashboard');
+        // Check if user has admin role
+        if (data.data.user.role === 'ADMIN' || data.data.user.role === 'SUPER_ADMIN') {
+          toast.success(data.message || 'Login successful');
+          login(data.data.user, data.data.accessToken);
+          navigate('/dashboard');
+        } else {
+          // User doesn't have admin privileges
+          toast.error('Access denied. Only administrators can access this panel.');
+        }
+      },
+      onError: (error) => {
+        // Handle verification errors
+        toast.error(error.message || 'Verification failed');
       }
     });
   };

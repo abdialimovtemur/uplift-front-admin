@@ -1,7 +1,7 @@
 // providers/AuthProvider.tsx
 import type { AuthContextType, User } from '@/types/auth'
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
-// import { User, AuthContextType } from '@/types/auth'
+import { toast } from 'sonner'
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
@@ -17,7 +17,7 @@ interface AuthProviderProps {
   children: ReactNode
 }
 
-// Cookie helper functions - BU FUNKSIYALARNI TAXRIRLAYMIZ
+// Cookie helper functions
 const setCookie = (name: string, value: string, days: number = 7) => {
   const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString()
   document.cookie = `${name}=${value}; expires=${expires}; path=/; SameSite=Strict${window.location.protocol === 'https:' ? '; Secure' : ''}`
@@ -65,7 +65,16 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
           if (verifyToken(token)) {
             try {
               const parsedUser = JSON.parse(userData)
-              setUser(parsedUser)
+              
+              // Check if user has admin role
+              if (parsedUser.role === 'ADMIN' || parsedUser.role === 'SUPER_ADMIN') {
+                setUser(parsedUser)
+              } else {
+                // User doesn't have admin privileges, clear cookies
+                deleteCookie('access_token')
+                deleteCookie('user')
+                toast.error('Access denied. Only administrators can access this panel.');
+              }
             } catch (error) {
               console.error('Error parsing user data:', error)
               deleteCookie('access_token')
@@ -88,10 +97,15 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   }, [])
 
   const login = (userData: User, token: string) => {
-    // Store token and user data in cookies
-    setCookie('access_token', token)
-    setCookie('user', JSON.stringify(userData))
-    setUser(userData)
+    // Check if user has admin role before logging in
+    if (userData.role === 'ADMIN' || userData.role === 'SUPER_ADMIN') {
+      // Store token and user data in cookies
+      setCookie('access_token', token)
+      setCookie('user', JSON.stringify(userData))
+      setUser(userData)
+    } else {
+      toast.error('Access denied. Only administrators can access this panel.');
+    }
   }
 
   const logout = () => {
